@@ -1,0 +1,94 @@
+.myapts-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.myapts-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.myapts-card input {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.myapts-card button[type="submit"] {
+  background: #0f766e;
+  color: #fff;
+  border: none;
+  padding: 12px 0;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.myapts-card button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.myapts-link-button {
+  background: none;
+  border: none;
+  color: #1d4ed8;
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: underline;
+  padding: 0;
+  align-self: flex-start;
+}
+
+.myapts-error {
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.myapts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.myapts-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.myapts-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.myapts-status {
+  font-size: 12px;
+  text-transform: capitalize;
+  color: #6b7280;
+}
+
+.myapts-status-cancelled {
+  color: #b91c1c;
+}
+
+.myapts-item-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.myapts-item-actions a {
+  font-size: 13px;
+  text-decoration: none;
+  color: #1d4ed8;
+}

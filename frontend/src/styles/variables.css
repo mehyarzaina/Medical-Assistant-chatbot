@@ -1,0 +1,50 @@
+:root {
+  /* Core palette (from your Zaina reference) */
+  --navy-950: #060a1f;
+  --navy-900: #0b1130;
+  --navy-800: #131a42;
+  --ink: #0b1130;
+  --ink-soft: #5b6478;
+  --paper: #f4f6fc;
+  --card: #ffffff;
+  --accent: #38bdf8;
+  --accent-dark: #0ea5e9;
+  --accent-bright: #7dd3fc;
+  --violet: #7c6cf6;
+  --border: #e2e6f3;
+  --error: #d64545;
+
+  /* Animated ombre gradient (used behind the Welcome hero) */
+  --ombre-1: #d6ecff;
+  --ombre-2: #a9d9ff;
+  --ombre-3: #73c2fb;
+  --ombre-4: #4fa8e0;
+  --ombre-5: #3893cc;
+
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-display: "Space Grotesk", var(--font-body);
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --shadow-card: 0 2px 12px rgba(11, 17, 48, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+
+.network-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}

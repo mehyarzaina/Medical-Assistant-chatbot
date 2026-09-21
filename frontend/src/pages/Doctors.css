@@ -1,0 +1,33 @@
+.doctors-page {
+  padding: 32px 40px;
+}
+
+.doctors-page h1 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  margin: 0 0 20px;
+}
+
+.doctors-search {
+  width: 100%;
+  max-width: 360px;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.doctors-status {
+  color: var(--ink-soft);
+}
+
+.doctors-error {
+  color: var(--error);
+}
+
+.doctors-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
