@@ -1,4 +1,4 @@
-# Zaina Medical — Technical Documentation
+# Technical Documentation
 
 A bilingual (Arabic/English) medical assistant and doctor-booking platform.
 Patients can ask grounded health questions, get matched to real doctors, book
