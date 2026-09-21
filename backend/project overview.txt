@@ -1,0 +1,24 @@
+Doctor appointment based on -> calendar Gmail personal 
+
+Backend -> fastapi mongo gemini redis 
+front end -> react
+
+
+Same as the n8n project 
+	• Nice interface using react 
+	• On the interface have image slides of people with doctors 
+	• Connect the chatbot to personal Gmail calendar (as if it’s the doctors calendar)
+	• The DB is mongo DB 
+	• APIs
+		○ The chatbot should be able to recommend the correct dr based on the users query 
+			§ Add an appointment (API) values (users name, email address, phone number, preferred time, appointment_ID (not given from the user))
+			§ Cancel appointment (API) parameters (user name, appointment_ID)
+			§ Reschedule (API) parameters (user name, appointment_ID)
+			
+	• Send confirmation on email (resend)
+	• Add a tab on the website with Drs profiles and all their details 
+	• Takes the users name, email address, phone number, preferred time -> to book the appointment
+	
+
+Later may 
+	Connect to whatsapp (send confirmation) or messages 
