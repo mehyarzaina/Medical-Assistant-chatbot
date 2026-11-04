@@ -19,10 +19,12 @@ function Doctors() {
   const { t } = useLanguage();
   usePageTitle('doctors');
   const [allDoctors, setAllDoctors] = useState([]);
-  const [doctors, setDoctors] = useState([]);
+  // Filtered results are stored with the filters they answer, so the effect
+  // below never has to reset state before fetching.
+  const [filtered, setFiltered] = useState({ key: null, doctors: [] });
   const [insuranceOptions, setInsuranceOptions] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState({
-    specialties: [], locations: [], insurances: [],
+    specialties: [], locations: [], insurances: [], availableWithin: null,
   });
   const [nameSearch, setNameSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -32,25 +34,28 @@ function Doctors() {
     Promise.all([getDoctors(), getInsuranceCompanies()])
       .then(([doctorsData, insuranceData]) => {
         setAllDoctors(doctorsData);
-        setDoctors(doctorsData);
         setInsuranceOptions(insuranceData);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
+  const { specialties, locations, insurances, availableWithin } = selectedFilters;
+  const noFilters =
+    specialties.length === 0 && locations.length === 0 && insurances.length === 0 && !availableWithin;
+  const filterKey = JSON.stringify(selectedFilters);
+
   useEffect(() => {
-    const { specialties, locations, insurances } = selectedFilters;
-    if (specialties.length === 0 && locations.length === 0 && insurances.length === 0) {
-      setDoctors(allDoctors);
-      return;
-    }
-    setLoading(true);
-    getDoctors({ specialties, locations, insurances })
-      .then(setDoctors)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [selectedFilters, allDoctors]);
+    if (noFilters) return;
+    let cancelled = false;
+    getDoctors(JSON.parse(filterKey))
+      .then((result) => { if (!cancelled) setFiltered({ key: filterKey, doctors: result }); })
+      .catch((err) => { if (!cancelled) { setError(err.message); setFiltered({ key: filterKey, doctors: [] }); } });
+    return () => { cancelled = true; };
+  }, [filterKey, noFilters]);
+
+  const doctors = noFilters ? allDoctors : filtered.key === filterKey ? filtered.doctors : [];
+  const busy = loading || (!noFilters && filtered.key !== filterKey);
 
   const filterOptions = {
     specialties: uniqueSorted(allDoctors.map((d) => d.specialty)),
@@ -87,12 +92,12 @@ function Doctors() {
       />
 
       <div aria-live="polite">
-        {loading && <p className="doctors-status">{t('doctors.loading')}</p>}
+        {busy && <p className="doctors-status">{t('doctors.loading')}</p>}
         {error && <p className="doctors-status doctors-error" role="alert">{t('doctors.loadError', { error })}</p>}
-        {!loading && !error && visibleDoctors.length === 0 && (
+        {!busy && !error && visibleDoctors.length === 0 && (
           <p className="doctors-status">{t('doctors.empty')}</p>
         )}
-        {!loading && !error && visibleDoctors.length > 0 && (
+        {!busy && !error && visibleDoctors.length > 0 && (
           <p className="doctors-status">
             {t('doctors.count', { count: visibleDoctors.length })} · {t('doctors.dataNote')}
           </p>

@@ -15,6 +15,34 @@ _WEEKDAY_AR = {
 }
 
 
+def day_name_query(weekday: int) -> dict:
+    """Mongo filter matching a weekday's stored name in either spelling.
+    The availability data writes some days without the hamza ("الاربعاء",
+    "الاحد"), so an exact match on _WEEKDAY_AR silently misses them."""
+    name = _WEEKDAY_AR[weekday]
+    plain = name.replace("أ", "ا").replace("إ", "ا")
+    return {"$in": sorted({name, plain})}
+
+
+def normalize_day_name(name: str) -> str:
+    return name.strip().replace("أ", "ا").replace("إ", "ا")
+
+
+def open_slots(from_time: str, to_time: str, taken: set[str], day, now=None) -> list[str]:
+    """Bookable start times on `day`: the template's slots minus booked ones,
+    and, for today, minus times that have already passed."""
+    import datetime as dt
+
+    slots = [t for t in _generate_slots(from_time, to_time) if t not in taken]
+    now = now or dt.datetime.now()
+    if day == now.date():
+        slots = [
+            t for t in slots
+            if dt.datetime.combine(day, dt.datetime.strptime(t, "%I:%M %p").time()) > now
+        ]
+    return slots
+
+
 def _generate_slots(from_time: str, to_time: str) -> list[str]:
     """Expands a doctor's from/to availability window into bookable slot
     start-times, spaced by `settings.appointment_duration_minutes` (30 by

@@ -12,8 +12,9 @@ async function apiFetch(path, options = {}) {
   return response.json();
 }
 
-export function getDoctors({ specialties = [], locations = [], insurances = [] } = {}) {
+export function getDoctors({ specialties = [], locations = [], insurances = [], availableWithin = null } = {}) {
   const params = new URLSearchParams();
+  if (availableWithin) params.set('available_within', availableWithin);
   specialties.forEach((s) => params.append('specialty', s));
   locations.forEach((l) => params.append('location', l));
   insurances.forEach((i) => params.append('insurance', i));

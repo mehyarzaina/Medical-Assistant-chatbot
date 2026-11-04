@@ -16,3 +16,39 @@
   font-size: 0.85rem;
   cursor: pointer;
 }
+.filter-select-wrap {
+  position: relative;
+}
+
+/* Native select, styled like the multi-select triggers next to it. */
+.filter-select {
+  appearance: none;
+  padding-block: 10px;
+  padding-inline: 14px 36px;
+  min-width: 190px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.filter-select.is-active {
+  border-color: var(--accent-text);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.filter-select-wrap::after {
+  content: "▼";
+  position: absolute;
+  inset-inline-end: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.65rem;
+  color: var(--ink-soft);
+  pointer-events: none;
+}

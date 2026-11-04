@@ -185,6 +185,14 @@ const en = {
     insurance: 'Insurance',
     clear: 'Clear filters',
     noOptions: 'No options',
+    availability: 'Availability',
+    anyAvailability: 'Any availability',
+    openWithin: {
+      1: 'Free slots today',
+      3: 'Free slots in the next 3 days',
+      7: 'Free slots this week',
+      14: 'Free slots in the next 2 weeks',
+    },
   },
 
   doctor: {

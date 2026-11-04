@@ -17,7 +17,7 @@ from app.models import (
     RescheduleAppointmentRequest,
 )
 from app.routers.auth import get_email_from_session
-from app.scheduling import _generate_slots, _WEEKDAY_AR
+from app.scheduling import day_name_query, open_slots
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from app import email_service
 
@@ -41,14 +41,11 @@ async def _get_appointment_with_valid_token(appointment_id: str, access_token: s
 
 @router.get("/available-slots", response_model=list[AvailableSlot])
 async def available_slots(doctor_id: str, date: date_type):
-    day_name = _WEEKDAY_AR[date.weekday()]
     template = await availability_col().find_one(
-        {"doctor_id": doctor_id, "day_name": day_name}
+        {"doctor_id": doctor_id, "day_name": day_name_query(date.weekday())}
     )
     if not template:
         return []
-
-    all_slots = _generate_slots(template["from_time"], template["to_time"])
 
     taken_cursor = appointments_col().find(
         {
@@ -60,7 +57,10 @@ async def available_slots(doctor_id: str, date: date_type):
     )
     taken = {doc["time"] async for doc in taken_cursor}
 
-    return [AvailableSlot(date=date, time=t) for t in all_slots if t not in taken]
+    return [
+        AvailableSlot(date=date, time=t)
+        for t in open_slots(template["from_time"], template["to_time"], taken, date)
+    ]
 
 
 @router.post("", response_model=BookAppointmentResponse)
