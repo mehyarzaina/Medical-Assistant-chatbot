@@ -19,9 +19,13 @@ app = FastAPI(
 # frontend and backend are running on different addresses during development so CORS allows both to run at the same  time
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_methods=["*"], # accepts all methods (get, post, put, etc..) from backend
-    allow_headers=["*"], # This allows requests from frontend to contain any HTTP headers.
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Add all the endpoints defined in router to my app.

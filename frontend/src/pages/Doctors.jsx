@@ -4,6 +4,8 @@ import FilterBar from '../components/FilterBar';
 import DoctorCard from '../components/DoctorCard';
 import DoctorDetail from '../components/DoctorDetail';
 import { getDoctors, getInsuranceCompanies } from '../api';
+import { useLanguage } from '../i18n/useLanguage';
+import usePageTitle from '../hooks/usePageTitle';
 import './Doctors.css';
 
 function uniqueSorted(values) {
@@ -15,6 +17,8 @@ function cityFromLocation(location = '') {
 }
 
 function Doctors() {
+  const { t } = useLanguage();
+  usePageTitle('doctors');
   const [allDoctors, setAllDoctors] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [insuranceOptions, setInsuranceOptions] = useState([]);
@@ -63,12 +67,14 @@ function Doctors() {
   return (
     <div className="doctors-page">
       <BackButton />
-      <h1>Doctors</h1>
+      <h1>{t('doctors.title')}</h1>
 
+      <label className="doctors-search-label" htmlFor="doctor-search">{t('doctors.searchLabel')}</label>
       <input
-        type="text"
+        id="doctor-search"
+        type="search"
         className="doctors-search"
-        placeholder="Search by doctor name…"
+        placeholder={t('doctors.searchPlaceholder')}
         value={nameSearch}
         onChange={(e) => setNameSearch(e.target.value)}
       />
@@ -79,11 +85,18 @@ function Doctors() {
         onChange={setSelectedFilters}
       />
 
-      {loading && <p className="doctors-status">Loading doctors…</p>}
-      {error && <p className="doctors-status doctors-error">Couldn't load doctors: {error}</p>}
-      {!loading && !error && visibleDoctors.length === 0 && (
-        <p className="doctors-status">No doctors match those filters.</p>
-      )}
+      <div aria-live="polite">
+        {loading && <p className="doctors-status">{t('doctors.loading')}</p>}
+        {error && <p className="doctors-status doctors-error" role="alert">{t('doctors.loadError', { error })}</p>}
+        {!loading && !error && visibleDoctors.length === 0 && (
+          <p className="doctors-status">{t('doctors.empty')}</p>
+        )}
+        {!loading && !error && visibleDoctors.length > 0 && (
+          <p className="doctors-status">
+            {t('doctors.count', { count: visibleDoctors.length })} · {t('doctors.dataNote')}
+          </p>
+        )}
+      </div>
 
       <div className="doctors-grid">
         {visibleDoctors.map((doctor) => (

@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../i18n/useLanguage';
 import './BackButton.css';
 
 function BackButton({ fallback = '/' }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleClick = () => {
     if (window.history.length > 1) {
@@ -13,8 +15,9 @@ function BackButton({ fallback = '/' }) {
   };
 
   return (
-    <button className="back-button" onClick={handleClick}>
-      ← Back
+    <button type="button" className="back-button" onClick={handleClick}>
+      <span className="back-button-arrow" aria-hidden="true">←</span>
+      {t('common.back')}
     </button>
   );
 }

@@ -1,40 +1,79 @@
 import { Link } from 'react-router-dom';
 import NetworkCanvas from '../components/NetworkCanvas';
+import { useLanguage } from '../i18n/useLanguage';
+import usePageTitle from '../hooks/usePageTitle';
 import './Welcome.css';
 
 function Welcome() {
+  const { t } = useLanguage();
+  usePageTitle('home');
+  const steps = t('welcome.steps');
+  const features = t('welcome.features');
+
   return (
     <div className="welcome-page">
-      <section className="welcome-hero">
+      <section className="welcome-hero" aria-labelledby="welcome-title">
         <NetworkCanvas />
         <div className="welcome-hero-content">
-          <h1>Book a doctor's appointment, without the phone tag</h1>
-          <p className="welcome-lede">
-            Tell the assistant what's going on, get matched to the right doctor,
-            and book a real open slot — all in one place.
-          </p>
-          <Link to="/chat" className="welcome-cta">Start chatting</Link>
+          <span className="welcome-eyebrow">{t('welcome.eyebrow')}</span>
+          <h1 id="welcome-title">{t('welcome.title')}</h1>
+          <p className="welcome-lede">{t('welcome.lede')}</p>
+          <div className="welcome-hero-actions">
+            <Link to="/chat" className="welcome-cta">{t('welcome.ctaChat')}</Link>
+            <Link to="/doctors" className="welcome-cta welcome-cta-outline">{t('welcome.ctaDoctors')}</Link>
+          </div>
+        </div>
+
+        <a href="#how-it-works" className="welcome-scroll-cue" aria-label={t('welcome.scroll')}>
+          <span className="welcome-scroll-cue-icon" aria-hidden="true">
+            <span className="welcome-scroll-chevron" />
+            <span className="welcome-scroll-chevron" />
+          </span>
+        </a>
+      </section>
+
+      <section id="how-it-works" className="welcome-info-section">
+        <div className="welcome-steps">
+          <h2>{t('welcome.howTitle')}</h2>
+          <p className="welcome-section-lede">{t('welcome.howLede')}</p>
+          <ol className="steps-grid">
+            {steps.map((step, i) => (
+              <li className="step-card" key={step.title}>
+                <span className="step-number" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="welcome-explainer">
+          <h2>{t('welcome.featuresTitle')}</h2>
+          <p className="welcome-section-lede">{t('welcome.featuresLede')}</p>
+          <ul className="explainer-grid">
+            {features.map((f) => (
+              <li className="explainer-card" key={f.title}>
+                <h3>{f.title}</h3>
+                <p>{f.body}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="welcome-explainer">
-        <h2>What you can do here</h2>
-        <div className="explainer-grid">
-          <div className="explainer-card">
-            <h3>Chat with the assistant</h3>
-            <p>Describe your symptoms or what kind of care you need in plain language, and get matched to a relevant doctor.</p>
+      <section className="welcome-closing-section">
+        <div className="welcome-trust">
+          <div className="welcome-trust-inner">
+            <h2>{t('welcome.noticeTitle')}</h2>
+            <p>{t('welcome.noticeBody')}</p>
           </div>
-          <div className="explainer-card">
-            <h3>Get a doctor recommendation</h3>
-            <p>The assistant searches doctor profiles by meaning, not just keywords, so it can match you even from a loose description.</p>
-          </div>
-          <div className="explainer-card">
-            <h3>Book, cancel, or reschedule</h3>
-            <p>Pick an open time slot and book directly. You'll get an email confirmation with one-click cancel and reschedule links.</p>
-          </div>
-          <div className="explainer-card">
-            <h3>Browse doctors yourself</h3>
-            <p>Prefer to look around on your own? Search and filter the full doctor directory by specialty, location, or insurance.</p>
+        </div>
+
+        <div className="welcome-final-cta">
+          <h2>{t('welcome.finalTitle')}</h2>
+          <div className="welcome-final-cta-actions">
+            <Link to="/chat" className="welcome-cta">{t('welcome.ctaChat')}</Link>
+            <Link to="/doctors" className="welcome-cta welcome-cta-outline">{t('welcome.ctaDoctors')}</Link>
           </div>
         </div>
       </section>

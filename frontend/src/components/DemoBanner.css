@@ -1,0 +1,16 @@
+.demo-banner {
+  padding: 8px 24px;
+  background: #fff7e0;
+  border-bottom: 1px solid #f0dfa8;
+  color: #5c4500;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.demo-banner a {
+  color: #5c4500;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

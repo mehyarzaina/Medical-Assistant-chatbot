@@ -1,19 +1,22 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { getDoctorAvailability } from '../api';
+import { useLanguage } from '../i18n/useLanguage';
 import AvailabilitySchedule from './AvailabilitySchedule';
+import { getInitials } from '../utils/doctor';
 import './DoctorCard.css';
 
-function getInitials(name = '') {
-  return name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('');
-}
+const ABOUT_PREVIEW_LENGTH = 140;
 
 function DoctorCard({ doctor, onSelect }) {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   const [schedule, setSchedule] = useState(null);
   const [loadingSchedule, setLoadingSchedule] = useState(false);
+  const detailsId = useId();
 
-  function toggleExpanded(e) {
-    e.stopPropagation();
+  const aboutIsLong = doctor.about && doctor.about.length > ABOUT_PREVIEW_LENGTH;
+
+  function toggleExpanded() {
     const next = !expanded;
     setExpanded(next);
     if (next && schedule === null) {
@@ -26,47 +29,58 @@ function DoctorCard({ doctor, onSelect }) {
   }
 
   return (
-    <div className="doctor-row">
-      <button type="button" className="doctor-row-view-btn" onClick={() => onSelect(doctor.doctor_id)}>
-        View profile
-      </button>
+    <article className="doctor-row">
+      <div className="doctor-avatar" aria-hidden="true" dir="auto">{getInitials(doctor.name)}</div>
 
       <div className="doctor-row-content">
-        <div className="doctor-row-header">
-          <div className="doctor-row-name-block">
-            <h3 className="doctor-row-name">{doctor.name}</h3>
-            {doctor.specialty && <span className="doctor-row-specialty">{doctor.specialty}</span>}
-          </div>
-          <div className="doctor-avatar">{getInitials(doctor.name)}</div>
-        </div>
+        <h3 className="doctor-row-name" dir="auto">{doctor.name}</h3>
+        {doctor.specialty && <p className="doctor-row-specialty" dir="auto">{doctor.specialty}</p>}
 
         {doctor.location && (
           <p className="doctor-row-location">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M12 21s-7-6.5-7-11.5A7 7 0 0 1 19 9.5C19 14.5 12 21 12 21z" />
               <circle cx="12" cy="9.5" r="2.5" />
             </svg>
-            {doctor.location}
+            <span className="visually-hidden">{t('doctor.location')}: </span>
+            <span dir="auto">{doctor.location}</span>
           </p>
         )}
 
         {doctor.about && (
-          <p className="doctor-row-about">
-            {expanded ? doctor.about : (doctor.about.length > 140 ? `${doctor.about.slice(0, 140)}…` : doctor.about)}{' '}
-            <span className="doctor-row-more" onClick={toggleExpanded}>
-              {expanded ? 'See less' : 'See more'}
-            </span>
+          <p className="doctor-row-about" dir="auto" id={detailsId}>
+            {expanded || !aboutIsLong ? doctor.about : `${doctor.about.slice(0, ABOUT_PREVIEW_LENGTH)}…`}
           </p>
         )}
 
         {expanded && (
           <div className="doctor-row-availability">
-            <h4>Availability</h4>
+            <h4>{t('doctor.availability')}</h4>
             <AvailabilitySchedule schedule={schedule} loading={loadingSchedule} />
           </div>
         )}
+
+        <div className="doctor-row-actions">
+          <button
+            type="button"
+            className="doctor-row-view-btn"
+            onClick={() => onSelect(doctor.doctor_id)}
+            aria-label={t('doctor.profileOf', { name: doctor.name })}
+          >
+            {t('doctor.viewProfile')}
+          </button>
+          <button
+            type="button"
+            className="doctor-row-more"
+            onClick={toggleExpanded}
+            aria-expanded={expanded}
+            aria-controls={detailsId}
+          >
+            {expanded ? t('doctor.seeLess') : t('doctor.seeMore')}
+          </button>
+        </div>
       </div>
-    </div>
+    </article>
   );
 }
 

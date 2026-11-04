@@ -1,5 +1,5 @@
 .reschedule-page {
-  min-height: 100vh;
+  min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +15,7 @@
   width: 100%;
 }
 
-.reschedule-card h2 {
+.reschedule-card h1 {
   font-family: var(--font-display);
   font-size: 1.3rem;
   margin: 0 0 8px;

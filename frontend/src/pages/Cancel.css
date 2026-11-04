@@ -1,6 +1,6 @@
 /* Cancel.css */
 .cancel-page {
-  min-height: 100vh;
+  min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,10 +24,20 @@
 
 .cancel-actions {
   margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 20px;
+}
+
+.cancel-keep {
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .cancel-confirm {
-  background: #b91c1c;
+  background: var(--error);
   color: #fff;
   border: none;
   padding: 12px 24px;
@@ -43,5 +53,5 @@
 }
 
 .cancel-error {
-  color: #b91c1c;
+  color: var(--error);
 }

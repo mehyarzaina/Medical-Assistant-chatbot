@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { getAppointment, rescheduleAppointment, getAvailableSlots } from "../api";
+import SlotPicker from "../components/SlotPicker";
+import { todayISO } from "../utils/date";
+import { useLanguage } from "../i18n/useLanguage";
+import usePageTitle from "../hooks/usePageTitle";
 import "../components/BookingModal.css"; // reuse the same slot/date/button styling
 import "./Reschedule.css";
 
-function todayISO() {
-  return new Date().toISOString().split("T")[0];
-}
-
 export default function Reschedule() {
+  const { t } = useLanguage();
+  usePageTitle("reschedule");
+  const slotsLabelId = useId();
   const { appointmentId } = useParams();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
@@ -30,7 +33,7 @@ export default function Reschedule() {
   // Load the existing appointment first (needs doctor_id for slot lookups)
   useEffect(() => {
     if (!token) {
-      setLoadError("Missing access token in this link.");
+      setLoadError(t("reschedule.missingToken"));
       setLoadingAppointment(false);
       return;
     }
@@ -38,6 +41,8 @@ export default function Reschedule() {
       .then(setAppointment)
       .catch((err) => setLoadError(err.message))
       .finally(() => setLoadingAppointment(false));
+    // t is left out on purpose: switching language must not refetch the appointment.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appointmentId, token]);
 
   // Same slot-fetch + normalization pattern as BookingModal
@@ -75,19 +80,19 @@ export default function Reschedule() {
   }
 
   if (loadingAppointment) {
-    return <div className="reschedule-page"><p className="booking-status">Loading…</p></div>;
+    return <div className="reschedule-page"><p className="booking-status" role="status">{t("common.loading")}</p></div>;
   }
   if (loadError) {
-    return <div className="reschedule-page"><p className="booking-status booking-error">{loadError}</p></div>;
+    return <div className="reschedule-page"><p className="booking-status booking-error" role="alert">{loadError}</p></div>;
   }
 
   if (confirmed) {
     return (
       <div className="reschedule-page">
-        <div className="reschedule-card booking-success">
-          <div className="booking-success-icon">✓</div>
-          <h2>Appointment rescheduled</h2>
-          <p>With <strong>{appointment.doctor_name}</strong>, now on <strong>{date}</strong> at <strong>{selectedTime}</strong>.</p>
+        <div className="reschedule-card booking-success" role="status">
+          <div className="booking-success-icon" aria-hidden="true">✓</div>
+          <h1>{t("reschedule.successTitle")}</h1>
+          <p>{t("reschedule.successBody", { name: appointment.doctor_name, date, time: selectedTime })}</p>
         </div>
       </div>
     );
@@ -96,12 +101,12 @@ export default function Reschedule() {
   return (
     <div className="reschedule-page">
       <div className="reschedule-card">
-        <h2>Reschedule with {appointment.doctor_name}</h2>
+        <h1>{t("reschedule.title", { name: appointment.doctor_name })}</h1>
         <p className="reschedule-current">
-          Currently booked for <strong>{appointment.date}</strong> at <strong>{appointment.time}</strong>.
+          {t("reschedule.current", { date: appointment.date, time: appointment.time })}
         </p>
 
-        <label className="booking-label" htmlFor="reschedule-date">New date</label>
+        <label className="booking-label" htmlFor="reschedule-date">{t("reschedule.newDate")}</label>
         <input
           id="reschedule-date"
           type="date"
@@ -111,26 +116,16 @@ export default function Reschedule() {
           onChange={(e) => setDate(e.target.value)}
         />
 
-        <p className="booking-label">Available times</p>
-        {slotsLoading && <p className="booking-status">Loading slots…</p>}
-        {slotsError && <p className="booking-status booking-error">Couldn't load slots: {slotsError}</p>}
-        {!slotsLoading && !slotsError && slots.length === 0 && (
-          <p className="booking-status">No open slots on this date — try another day.</p>
-        )}
-        <div className="booking-slot-grid">
-          {slots.map((time) => (
-            <button
-              type="button"
-              key={time}
-              className={`booking-slot ${selectedTime === time ? "selected" : ""}`}
-              onClick={() => setSelectedTime(time)}
-            >
-              {time}
-            </button>
-          ))}
-        </div>
+        <SlotPicker
+          slots={slots}
+          selectedTime={selectedTime}
+          onSelect={setSelectedTime}
+          loading={slotsLoading}
+          error={slotsError}
+          labelId={slotsLabelId}
+        />
 
-        {submitError && <p className="booking-status booking-error">{submitError}</p>}
+        {submitError && <p className="booking-status booking-error" role="alert">{submitError}</p>}
 
         <button
           type="button"
@@ -138,7 +133,11 @@ export default function Reschedule() {
           disabled={!selectedTime || submitting}
           onClick={handleConfirm}
         >
-          {submitting ? "Rescheduling…" : selectedTime ? `Confirm for ${selectedTime}` : "Pick a time"}
+          {submitting
+            ? t("reschedule.submitting")
+            : selectedTime
+              ? t("reschedule.confirm", { time: selectedTime })
+              : t("reschedule.pick")}
         </button>
       </div>
     </div>

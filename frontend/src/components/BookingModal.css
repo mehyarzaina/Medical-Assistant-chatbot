@@ -22,8 +22,11 @@
 
 .booking-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 12px;
+  inset-inline-end: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   background: none;
   border: none;
   font-size: 1.1rem;
@@ -31,10 +34,16 @@
   cursor: pointer;
 }
 
+.booking-close:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
 .booking-panel h2 {
   font-family: var(--font-display);
   font-size: 1.15rem;
   margin: 0 0 20px;
+  padding-inline-end: 40px;
 }
 
 .booking-label {
@@ -49,16 +58,47 @@
 .booking-form input {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--card);
 }
 
-.booking-date-input:focus,
-.booking-form input:focus {
-  outline: none;
-  border-color: var(--accent);
+.booking-date-input:focus-visible,
+.booking-form input:focus-visible {
+  border-color: var(--focus);
+}
+
+.booking-hint {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.booking-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.booking-form .booking-consent input {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin: 2px 0 0;
+  padding: 0;
+  accent-color: var(--accent-text);
+}
+
+.booking-consent a {
+  color: var(--accent-text);
+  font-weight: 600;
 }
 
 .booking-status {
@@ -79,7 +119,7 @@
 
 .booking-slot {
   padding: 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   background: var(--paper);
   color: var(--ink);
@@ -89,12 +129,12 @@
 }
 
 .booking-slot:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .booking-slot.selected {
-  background: var(--accent-dark);
-  border-color: var(--accent-dark);
+  background: var(--accent-text);
+  border-color: var(--accent-text);
   color: #fff;
 }
 
@@ -131,7 +171,7 @@
   height: 48px;
   border-radius: 50%;
   background: rgba(56, 189, 248, 0.15);
-  color: var(--accent-dark);
+  color: var(--accent-text);
   font-size: 1.4rem;
   display: flex;
   align-items: center;
@@ -146,4 +186,16 @@
 .booking-success-note {
   color: var(--ink-soft);
   font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .booking-overlay {
+    padding: 16px;
+  }
+  .booking-panel {
+    padding: 24px 18px;
+  }
+  .booking-slot-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

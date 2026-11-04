@@ -1,18 +1,23 @@
 :root {
-  /* Core palette (from your Zaina reference) */
+  /* Core palette */
   --navy-950: #060a1f;
   --navy-900: #0b1130;
   --navy-800: #131a42;
   --ink: #0b1130;
-  --ink-soft: #5b6478;
+  --ink-soft: #4f586c;
   --paper: #f4f6fc;
   --card: #ffffff;
   --accent: #38bdf8;
   --accent-dark: #0ea5e9;
+  /* Accent dark enough for text and thin borders on white (WCAG AA, 4.5:1+) */
+  --accent-text: #0369a1;
   --accent-bright: #7dd3fc;
   --violet: #7c6cf6;
   --border: #e2e6f3;
-  --error: #d64545;
+  --border-strong: #8a93a8;
+  --error: #b42318;
+  --success: #067647;
+  --focus: #0369a1;
 
   /* Animated ombre gradient (used behind the Welcome hero) */
   --ombre-1: #d6ecff;
@@ -21,25 +26,74 @@
   --ombre-4: #4fa8e0;
   --ombre-5: #3893cc;
 
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-body: "Inter", "IBM Plex Sans Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-display: "Space Grotesk", var(--font-body);
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 
   --radius-lg: 18px;
   --radius-md: 12px;
+  --radius-pill: 999px;
   --shadow-card: 0 2px 12px rgba(11, 17, 48, 0.12);
+  --shadow-card-hover: 0 12px 28px -10px rgba(11, 17, 48, 0.28);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --sidebar-width: 240px;
+  --topbar-height: 60px;
+}
+
+/* Arabic: one typeface for body and headings; Latin display fonts have no Arabic glyphs. */
+html[lang="ar"] {
+  --font-body: "IBM Plex Sans Arabic", "Inter", Tahoma, sans-serif;
+  --font-display: "IBM Plex Sans Arabic", "Inter", Tahoma, sans-serif;
+  --font-mono: "IBM Plex Sans Arabic", Tahoma, sans-serif;
 }
 
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
-  height: 100%;
+  min-height: 100%;
   font-family: var(--font-body);
   background: var(--paper);
   color: var(--ink);
+  -webkit-font-smoothing: antialiased;
 }
 
+html[lang="ar"] body {
+  line-height: 1.7;
+}
+
+/* Arabic is joined script: letter-spacing breaks the joins. */
+html[lang="ar"] * {
+  letter-spacing: 0 !important;
+}
+
+/* One visible focus style for every interactive element, keyboard only. */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .network-canvas {
   position: absolute;

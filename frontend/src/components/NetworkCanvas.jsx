@@ -70,7 +70,7 @@ function NetworkCanvas({ opacity = 0.55 }) {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="network-canvas" style={{ opacity }} />;
+  return <canvas aria-hidden="true" ref={canvasRef} className="network-canvas" style={{ opacity }} />;
 }
 
 export default NetworkCanvas;

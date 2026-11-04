@@ -5,5 +5,51 @@
 
 .app-content {
   flex: 1;
-  margin-left: 220px;
+  min-width: 0; /* lets long content shrink instead of forcing horizontal scroll */
+  margin-inline-start: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content > main {
+  flex: 1;
+}
+
+.app-content > main:focus {
+  outline: none;
+}
+
+.app-content-fill {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.app-content-fill > main {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 16px;
+  top: -100px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 16px;
+}
+
+@media (max-width: 900px) {
+  .app-content {
+    margin-inline-start: 0;
+    padding-top: var(--topbar-height);
+  }
 }

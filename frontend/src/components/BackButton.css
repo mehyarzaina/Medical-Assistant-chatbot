@@ -17,3 +17,6 @@
   color: var(--ink);
   border-color: var(--accent);
 }
+[dir="rtl"] .back-button-arrow {
+  transform: scaleX(-1);
+}

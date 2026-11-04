@@ -1,7 +1,7 @@
 # models.py
 from datetime import date as date_type
 from enum import Enum
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -104,6 +104,7 @@ class DoctorRecommendResponse(BaseModel):
 class ChatRequest(BaseModel):
     session_id: str | None = None
     message: str
+    language: Literal["en", "ar"] = "en"  # site UI language, used when the message has no letters
 
 
 class ChatResponse(BaseModel):

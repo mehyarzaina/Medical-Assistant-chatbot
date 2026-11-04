@@ -1,12 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getAvailableSlots, bookAppointment } from '../api';
+import { useLanguage } from '../i18n/useLanguage';
+import Modal from './Modal';
+import SlotPicker from './SlotPicker';
+import { todayISO } from '../utils/date';
 import './BookingModal.css';
 
-function todayISO() {
-  return new Date().toISOString().split('T')[0];
-}
-
 function BookingModal({ doctorId, doctorName, onClose }) {
+  const { t } = useLanguage();
+  const titleId = useId();
+  const slotsLabelId = useId();
   const [date, setDate] = useState(todayISO());
   const [slots, setSlots] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
@@ -16,6 +20,7 @@ function BookingModal({ doctorId, doctorName, onClose }) {
   const [patientName, setPatientName] = useState('');
   const [patientEmail, setPatientEmail] = useState('');
   const [patientPhone, setPatientPhone] = useState('');
+  const [consent, setConsent] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -46,6 +51,7 @@ function BookingModal({ doctorId, doctorName, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!consent) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -54,9 +60,9 @@ function BookingModal({ doctorId, doctorName, onClose }) {
         date,
         time: selectedTime,
         patient: {
-          name: patientName,
-          email: patientEmail,
-          phone: patientPhone,
+          name: patientName.trim(),
+          email: patientEmail.trim(),
+          phone: patientPhone.trim(),
         },
       });
       setConfirmed(true);
@@ -67,96 +73,112 @@ function BookingModal({ doctorId, doctorName, onClose }) {
     }
   };
 
+  const closeButton = (
+    <button type="button" className="booking-close" onClick={onClose} aria-label={t('common.close')}>
+      <span aria-hidden="true">✕</span>
+    </button>
+  );
+
   if (confirmed) {
     return (
-      <div className="booking-overlay" onClick={onClose}>
-        <div className="booking-panel" onClick={(e) => e.stopPropagation()}>
-          <button type="button" className="booking-close" onClick={onClose}>✕</button>
-          <div className="booking-success">
-            <div className="booking-success-icon">✓</div>
-            <h2>Appointment booked</h2>
-            <p>With <strong>{doctorName}</strong> on <strong>{date}</strong> at <strong>{selectedTime}</strong>.</p>
-            <p className="booking-success-note">A confirmation email is on its way to {patientEmail}.</p>
-            <button type="button" className="booking-submit-btn" onClick={onClose}>Done</button>
-          </div>
+      <Modal labelledBy={titleId} onClose={onClose} overlayClassName="booking-overlay" panelClassName="booking-panel">
+        {closeButton}
+        <div className="booking-success" role="status">
+          <div className="booking-success-icon" aria-hidden="true">✓</div>
+          <h2 id={titleId}>{t('booking.successTitle')}</h2>
+          <p>{t('booking.successBody', { name: doctorName, date, time: selectedTime })}</p>
+          <p className="booking-success-note">{t('booking.successEmail', { email: patientEmail })}</p>
+          <button type="button" className="booking-submit-btn" onClick={onClose}>{t('booking.done')}</button>
         </div>
-      </div>
+      </Modal>
     );
   }
 
+  const [consentBefore, consentAfter] = t('booking.consent').split('{privacy}');
+
   return (
-    <div className="booking-overlay" onClick={onClose}>
-      <div className="booking-panel" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="booking-close" onClick={onClose}>✕</button>
-        <h2>Book with {doctorName}</h2>
+    <Modal labelledBy={titleId} onClose={onClose} overlayClassName="booking-overlay" panelClassName="booking-panel">
+      {closeButton}
+      <h2 id={titleId}>{t('booking.title', { name: doctorName })}</h2>
 
-        <label className="booking-label" htmlFor="booking-date">Date</label>
-        <input
-          id="booking-date"
-          type="date"
-          className="booking-date-input"
-          min={todayISO()}
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
+      <label className="booking-label" htmlFor="booking-date">{t('booking.date')}</label>
+      <input
+        id="booking-date"
+        type="date"
+        className="booking-date-input"
+        min={todayISO()}
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+      />
 
-        <p className="booking-label">Available times</p>
-        {slotsLoading && <p className="booking-status">Loading slots…</p>}
-        {slotsError && <p className="booking-status booking-error">Couldn't load slots: {slotsError}</p>}
-        {!slotsLoading && !slotsError && slots.length === 0 && (
-          <p className="booking-status">No open slots on this date — try another day.</p>
-        )}
-        <div className="booking-slot-grid">
-          {slots.map((time) => (
-            <button
-              type="button"
-              key={time}
-              className={`booking-slot ${selectedTime === time ? 'selected' : ''}`}
-              onClick={() => setSelectedTime(time)}
-            >
-              {time}
-            </button>
-          ))}
-        </div>
+      <SlotPicker
+        slots={slots}
+        selectedTime={selectedTime}
+        onSelect={setSelectedTime}
+        loading={slotsLoading}
+        error={slotsError}
+        labelId={slotsLabelId}
+      />
 
-        {selectedTime && (
-          <form className="booking-form" onSubmit={handleSubmit}>
-            <label className="booking-label" htmlFor="patient-name">Your name</label>
+      {selectedTime && (
+        <form className="booking-form" onSubmit={handleSubmit}>
+          <label className="booking-label" htmlFor="patient-name">{t('booking.name')}</label>
+          <input
+            id="patient-name"
+            type="text"
+            required
+            autoComplete="name"
+            value={patientName}
+            onChange={(e) => setPatientName(e.target.value)}
+          />
+
+          <label className="booking-label" htmlFor="patient-email">{t('booking.email')}</label>
+          <input
+            id="patient-email"
+            type="email"
+            required
+            autoComplete="email"
+            dir="ltr"
+            aria-describedby="patient-email-hint"
+            value={patientEmail}
+            onChange={(e) => setPatientEmail(e.target.value)}
+          />
+          <p className="booking-hint" id="patient-email-hint">{t('booking.emailHint')}</p>
+
+          <label className="booking-label" htmlFor="patient-phone">{t('booking.phone')}</label>
+          <input
+            id="patient-phone"
+            type="tel"
+            required
+            autoComplete="tel"
+            dir="ltr"
+            value={patientPhone}
+            onChange={(e) => setPatientPhone(e.target.value)}
+          />
+
+          <div className="booking-consent">
             <input
-              id="patient-name"
-              type="text"
+              id="booking-consent"
+              type="checkbox"
               required
-              value={patientName}
-              onChange={(e) => setPatientName(e.target.value)}
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
             />
+            <label htmlFor="booking-consent">
+              {consentBefore}
+              <Link to="/privacy" target="_blank" rel="noopener">{t('booking.consentPrivacy')}</Link>
+              {consentAfter}
+            </label>
+          </div>
 
-            <label className="booking-label" htmlFor="patient-email">Email</label>
-            <input
-              id="patient-email"
-              type="email"
-              required
-              value={patientEmail}
-              onChange={(e) => setPatientEmail(e.target.value)}
-            />
+          {submitError && <p className="booking-status booking-error" role="alert">{submitError}</p>}
 
-            <label className="booking-label" htmlFor="patient-phone">Phone</label>
-            <input
-              id="patient-phone"
-              type="tel"
-              required
-              value={patientPhone}
-              onChange={(e) => setPatientPhone(e.target.value)}
-            />
-
-            {submitError && <p className="booking-status booking-error">{submitError}</p>}
-
-            <button type="submit" className="booking-submit-btn" disabled={submitting}>
-              {submitting ? 'Booking…' : `Confirm for ${selectedTime}`}
-            </button>
-          </form>
-        )}
-      </div>
-    </div>
+          <button type="submit" className="booking-submit-btn" disabled={submitting || !consent}>
+            {submitting ? t('booking.submitting') : t('booking.submit', { time: selectedTime })}
+          </button>
+        </form>
+      )}
+    </Modal>
   );
 }
 

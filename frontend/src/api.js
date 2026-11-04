@@ -52,10 +52,12 @@ export function recommendDoctors(query, topK = 3, daysAhead = 7) {
   });
 }
 
-export async function sendChatMessage(sessionId, message) {
+// language is the site UI language; the backend uses it only when the
+// message itself has no letters to detect a language from.
+export async function sendChatMessage(sessionId, message, language) {
   return apiFetch("/chat", {
     method: "POST",
-    body: JSON.stringify({ session_id: sessionId, message }),
+    body: JSON.stringify({ session_id: sessionId, message, language }),
   });
 }
 

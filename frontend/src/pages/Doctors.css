@@ -1,5 +1,6 @@
 .doctors-page {
-  padding: 32px 40px;
+  max-width: 960px;
+  padding: 32px 40px 48px;
 }
 
 .doctors-page h1 {
@@ -8,18 +9,31 @@
   margin: 0 0 20px;
 }
 
+.doctors-search-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
 .doctors-search {
   width: 100%;
-  max-width: 360px;
-  padding: 10px 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
-  margin-bottom: 16px;
+  max-width: 380px;
+  padding: 11px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  margin-bottom: 14px;
 }
 
 .doctors-status {
   color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin: 0 0 16px;
 }
 
 .doctors-error {
@@ -29,5 +43,11 @@
 .doctors-grid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .doctors-page {
+    padding: 24px 16px 40px;
+  }
 }

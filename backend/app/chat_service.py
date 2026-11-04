@@ -14,6 +14,7 @@ SDK. Messages/tool-calls follow the OpenAI message format.
 """
 
 import json
+import re
 
 from groq import AsyncGroq
 
@@ -31,9 +32,17 @@ MAX_TOOL_ROUNDS = 4  # safety cap so a confused model can't loop forever
 
 SYSTEM_PROMPT = """You are a friendly medical intake assistant for a doctor
 booking website. You talk to patients in whatever language they write in
-(Arabic or English).
+(Arabic or English). Always reply in the language of the patient's most
+recent message, even if the retrieved articles or doctor data are in a
+different language — translate what you use.
 
 Your job:
+- If the patient describes possible emergency signs (chest pain, trouble
+  breathing, signs of stroke, severe bleeding, loss of consciousness,
+  thoughts of self-harm), first tell them to call 911 or go to the
+  nearest emergency department now, before anything else. Jordan's
+  emergency number is 911 in every language; write it as "911" and never
+  give any other number.
 - If the patient asks a general medical/health question (symptoms, what a
   condition is, general care info), call search_medical_info to look it up
   in the Altibbi article database, then answer USING ONLY that retrieved
@@ -110,11 +119,65 @@ async def _save_history(session_id: str, history: list[dict]) -> None:
     await cache_set(f"chat_history:{session_id}", history, ttl_seconds=HISTORY_TTL_SECONDS)
 
 
-async def handle_chat_message(session_id: str, message: str) -> tuple[str, list]:
-    history = await _get_history(session_id)
+LANGUAGE_NAMES = {"ar": "Arabic", "en": "English"}
 
+ERROR_REPLIES = {
+    "ar": "عذراً، حدث خطأ أثناء معالجة طلبك. حاول مرة أخرى.",
+    "en": "Sorry, something went wrong while handling your request. Please try again.",
+}
+
+
+def detect_language(text: str, fallback: str = "en") -> str:
+    """Pick 'ar' or 'en' from the script the message is written in.
+
+    Messages with no letters at all (a number, an emoji) fall back to the
+    site's UI language, so the reply still matches what the patient sees.
+    """
+    arabic = sum(1 for ch in text if "؀" <= ch <= "ۿ")
+    latin = sum(1 for ch in text if ch.isascii() and ch.isalpha())
+    if arabic == 0 and latin == 0:
+        return fallback if fallback in LANGUAGE_NAMES else "en"
+    return "ar" if arabic >= latin else "en"
+
+
+# The model invents Jordan's emergency number (100, 115, 997, 999...), even
+# when told it is 911. In replies about an emergency, a 2-4 digit number that
+# follows "call"/"number" in the same sentence is rewritten to 911. Other
+# numbers (doses, "for 14 days") don't follow those words and are left alone.
+_EMERGENCY_WORD = re.compile(r"emergency|ambulance|طوارئ|إسعاف|اسعاف", re.IGNORECASE)
+_CALLED_NUMBER = re.compile(
+    r"(?P<before>(?:\bcall\b|\bdial\b|number|رقم|اتصل|الاتصال)[^\d٠-٩.!?؟\n]{0,40}?)"
+    r"(?P<number>(?<![\d٠-٩])[\d٠-٩]{2,4}(?![\d٠-٩]))"
+    # ...unless it's a quantity: "call your doctor in 24 hours", "خلال 48 ساعة"
+    r"(?!\s*(?:hours?|hrs?|days?|minutes?|mins?|weeks?|mg|ml|ساع|يوم|أيام|ايام|دقيق|دقائق|أسبوع|اسبوع|ملغ|مل\b))",
+    re.IGNORECASE,
+)
+
+
+def enforce_emergency_number(reply: str) -> str:
+    if not _EMERGENCY_WORD.search(reply):
+        return reply
+    return _CALLED_NUMBER.sub(lambda m: m.group("before") + "911", reply)
+
+
+async def handle_chat_message(
+    session_id: str, message: str, ui_language: str = "en"
+) -> tuple[str, list]:
+    history = await _get_history(session_id)
+    reply_language = detect_language(message, fallback=ui_language)
+
+    # The model drifts toward the language of the history or the retrieved
+    # Arabic articles, so pin the reply language for this turn explicitly.
+    language_rule = {
+        "role": "system",
+        "content": (
+            f"Reply to this message in {LANGUAGE_NAMES[reply_language]} only. "
+            "If you mention an emergency number, it is 911 (written as the digits 911)."
+        ),
+    }
     messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history
     messages.append({"role": "user", "content": message})
+    messages.append(language_rule)
 
     doctors_out: list = []
     reply_text = ""
@@ -125,12 +188,16 @@ async def handle_chat_message(session_id: str, message: str) -> tuple[str, list]
             messages=messages,
             tools=TOOLS,
             tool_choice="auto",
-            max_tokens=400,  # keeps replies short and caps token spend
+            # Caps token spend. The model reasons before answering and that
+            # counts toward the cap, so 400 sometimes left nothing for the reply.
+            max_tokens=1024,
         )
         msg = completion.choices[0].message
 
         if not msg.tool_calls:
-            reply_text = msg.content or ""
+            if not (msg.content or "").strip():
+                continue  # empty answer: ask again (counts toward MAX_TOOL_ROUNDS)
+            reply_text = msg.content
             break
 
         # Record the assistant's tool-call turn before appending results.
@@ -192,7 +259,9 @@ async def handle_chat_message(session_id: str, message: str) -> tuple[str, list]
             )
     else:
         # Hit MAX_TOOL_ROUNDS without a final answer — bail gracefully.
-        reply_text = "عذراً، حدث خطأ أثناء معالجة طلبك. حاول مرة أخرى."
+        reply_text = ERROR_REPLIES[reply_language]
+
+    reply_text = enforce_emergency_number(reply_text)
 
     history.append({"role": "user", "content": message})
     history.append({"role": "assistant", "content": reply_text})

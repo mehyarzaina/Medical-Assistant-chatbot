@@ -9,9 +9,9 @@
 .filter-clear-btn {
   padding: 10px 16px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   background: transparent;
-  color: var(--ink-soft);
+  color: var(--ink);
   font-family: var(--font-body);
   font-size: 0.85rem;
   cursor: pointer;

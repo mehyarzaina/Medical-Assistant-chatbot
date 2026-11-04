@@ -1,0 +1,39 @@
+.not-found {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 16px;
+}
+
+.not-found-code {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0 0 12px;
+  color: var(--accent-text);
+}
+
+.not-found h1 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  margin: 0 0 8px;
+}
+
+.not-found p {
+  color: var(--ink-soft);
+  margin: 0 0 24px;
+}
+
+.not-found-link {
+  display: inline-block;
+  padding: 12px 24px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-decoration: none;
+}
