@@ -37,7 +37,6 @@ and manages doctors.
 ```
 backend/      FastAPI app (app/main.py, routers/, services)
 frontend/     React + Vite app (src/pages, src/components, src/i18n)
-demo-video/   Narration script and builder for the demo video
 ```
 
 ---
