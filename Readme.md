@@ -1,18 +1,127 @@
+# AI Medical Assistant Chatbot
+
+A bilingual (English/Arabic) medical assistant and doctor-booking web app.
+Patients describe their symptoms to an AI assistant, get matched with the
+right specialists, and book, reschedule or cancel appointments, with email
+confirmations and Google Calendar sync. An admin dashboard shows bookings
+and manages doctors.
+
+> Portfolio project, not a real medical service. Bookings are not sent to
+> doctors and the assistant does not give medical advice.
+
+**Demo video:** _add your YouTube link here_
+
+## Features
+
+- **AI assistant**: asks short follow-up questions like a receptionist, then recommends matching doctors (RAG over doctor profiles and medical articles)
+- **Doctor directory**: 1,100+ doctors, filters for specialty, city, insurance and availability, and a full profile page per doctor
+- **Booking**: pick a day and an open time slot on one page
+- **Emails and calendar**: confirmation, reschedule and cancellation emails, with Google Calendar events created, moved and deleted automatically
+- **My appointments**: no account needed; patients sign in with a 6-digit code sent to their email
+- **Admin dashboard**: charts for bookings by date, status, specialty and hour, plus management of appointments, doctors, patients and insurance companies
+- **Bilingual**: full Arabic translation with a right-to-left layout
+- **Legal pages**: privacy policy (written with Jordan's Personal Data Protection Law in mind), terms of use and cookie policy
+
+## Tech stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React 19, Vite, React Router |
+| Backend | Python 3.12, FastAPI, Uvicorn |
+| Databases | MongoDB Atlas, Redis (Upstash) |
+| AI | Groq LLM (`openai/gpt-oss-20b`), Zilliz Cloud vector search, embedding service |
+| Integrations | Google Calendar API, Gmail SMTP |
+
+## Project structure
+
+```
+backend/      FastAPI app (app/main.py, routers/, services)
+frontend/     React + Vite app (src/pages, src/components, src/i18n)
+demo-video/   Narration script and builder for the demo video
+```
+
+---
+
+## Getting started
+
+### 1. Prerequisites
+
+- Python 3.12 and Node.js 20+
+- A MongoDB Atlas cluster with the doctor data (collections listed in section 3.1 below)
+- A Redis instance (free [Upstash](https://upstash.com) database or local `redis-server`)
+- A [Groq](https://console.groq.com) API key
+- A [Zilliz Cloud](https://zilliz.com) cluster with the `altibbi_doctors` and `altibbi_articles` collections, and an embedding endpoint
+- A Gmail account with an [App Password](https://myaccount.google.com/apppasswords) for sending emails
+- A Google Cloud project with the Calendar API enabled and an OAuth **Desktop app** client, downloaded as `credentials.json`
+
+### 2. Backend
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env             # then fill in your own values
+```
+
+Put `credentials.json` in `backend/`, then connect Google Calendar once.
+This opens a browser window to sign in and saves `token.json`:
+
+```bash
+python -m app.google_calendar
+```
+
+> While the Google OAuth app is in "Testing" mode, add your Google account
+> as a test user, and expect to repeat this step every 7 days.
+
+Start the API:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The API runs at http://localhost:8000, with interactive docs at http://localhost:8000/docs.
+
+### 3. Frontend
+
+In a second terminal:
+
+```bash
+cd frontend
+npm install
+cp .env.example .env             # VITE_API_BASE_URL=http://localhost:8000
+npm run dev
+```
+
+Open http://localhost:5173.
+
+### 4. Using the app
+
+| Page | What to do |
+|---|---|
+| **Home** | Overview of the app. The language button in the sidebar switches between English and Arabic. |
+| **Assistant** | Describe a symptom (e.g. "my knee hurts when I climb stairs"), answer the follow-up questions, then open a recommended doctor. Past chats are saved in the sidebar. |
+| **Find a doctor** | Search and filter doctors, then open **View profile** and **Book appointment**. |
+| **Booking** | Choose a day and time, enter name, phone and email, accept the privacy policy and confirm. A confirmation email is sent and the event is added to Google Calendar. |
+| **My appointments** | Enter your email, type the 6-digit code you receive, then reschedule or cancel any booking. The links in the emails work too. |
+| **Admin** (`/admin`) | Log in with `ADMIN_PASSWORD` to see the dashboard, appointments, doctors, patients and insurance companies. |
+
+### Security notes
+
+- Never commit `.env`, `credentials.json` or `token.json`; they are already in `.gitignore`.
+- Free-tier MongoDB, Upstash and Zilliz instances pause when idle. If the app suddenly fails, check that they are running.
+
+---
+
 # Technical Documentation
 
-A bilingual (Arabic/English) medical assistant and doctor-booking platform.
-Patients can ask grounded health questions, get matched to real doctors, book
-appointments, and manage those bookings — all without a full user-account
-system.
+The sections below describe how the system works internally.
 
-> **Note on scope:** this document describes the FastAPI + React + MongoDB
-> rebuild (local folders `Medical_chatbot/` and `medical-chatbot-frontend/`),
-> which is the active codebase this documentation was built from. A few files
-> referenced below (`config.py`, `insurance.py`, `google_calendar.py`,
-> `Chat.jsx`, `BookingModal.jsx`) were not pasted directly in the conversation
-> this doc was generated from — they're described based on how other files
-> import and call them. Double-check exact field/function names against your
-> actual files where marked **(inferred)**.
+> **Note on scope:** in this repository the backend lives in `backend/` and
+> the frontend in `frontend/` (earlier notes call them `Medical_chatbot/` and
+> `medical-chatbot-frontend/`). A few files are described based on how other
+> files import and call them; double-check exact field/function names
+> against the code where marked **(inferred)**.
 
 ---
 
@@ -181,7 +290,7 @@ mechanism.
 
 ---
 
-## 6. Backend file guide (`Medical_chatbot/app/`)
+## 6. Backend file guide (`backend/app/`)
 
 | File | What it does |
 |---|---|
@@ -210,7 +319,7 @@ mechanism.
 
 ---
 
-## 7. Frontend file guide (`medical-chatbot-frontend/src/`)
+## 7. Frontend file guide (`frontend/src/`)
 
 | File | What it does |
 |---|---|
@@ -286,15 +395,15 @@ nothing references them post-migration.
 
 **Backend:**
 ```bash
-cd Medical_chatbot
-# .venv already set up per project notes
+cd backend
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 uvicorn app.main:app --reload
 # → http://localhost:8000, docs at http://localhost:8000/docs
 ```
 
 **Frontend:**
 ```bash
-cd medical-chatbot-frontend
+cd frontend
 npm run dev
 # → http://localhost:5173
 ```
