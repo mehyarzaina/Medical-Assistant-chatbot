@@ -9,7 +9,7 @@ and manages doctors.
 > Portfolio project, not a real medical service. Bookings are not sent to
 > doctors and the assistant does not give medical advice.
 
-**Demo video:** _add your YouTube link here_
+**Demo video:** https://youtu.be/UXVwzQCZSh4
 
 ## Features
 
