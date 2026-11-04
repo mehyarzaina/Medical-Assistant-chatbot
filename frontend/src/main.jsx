@@ -11,6 +11,7 @@ import '@fontsource/ibm-plex-sans-arabic/500.css';
 import '@fontsource/ibm-plex-sans-arabic/600.css';
 import '@fontsource/ibm-plex-sans-arabic/700.css';
 import './styles/variables.css';
+import './styles/ui.css';
 import { LanguageProvider } from './i18n/LanguageContext';
 import App from './App.jsx';
 

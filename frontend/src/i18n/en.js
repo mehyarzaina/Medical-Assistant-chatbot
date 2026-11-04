@@ -37,6 +37,7 @@ const en = {
   },
 
   titles: {
+    admin: 'Admin',
     home: 'Find and book a doctor',
     chat: 'Health assistant',
     doctors: 'Find a doctor',
@@ -48,34 +49,82 @@ const en = {
     terms: 'Terms of use',
     cookies: 'Cookie policy',
     notFound: 'Page not found',
+    doctor: 'Doctor profile',
+    book: 'Book an appointment',
   },
 
   welcome: {
-    eyebrow: 'Doctor search and booking',
-    title: 'Describe how you feel. Find the right doctor.',
-    lede: 'Tell the assistant what is going on in Arabic or English. It asks a few questions, suggests doctors whose specialty fits, and shows their open times.',
+    carouselLabel: 'Highlights',
+    slideOf: 'Slide {n} of {total}',
+    goToSlide: 'Go to slide {n}',
+    prevSlide: 'Previous slide',
+    nextSlide: 'Next slide',
+    pause: 'Pause',
+    play: 'Play',
     ctaChat: 'Talk to the assistant',
     ctaDoctors: 'Browse doctors',
     scroll: 'Scroll to how it works',
-    howTitle: 'How it works',
-    howLede: 'Four steps from a question to a booked time.',
+    slides: [
+      {
+        kicker: 'Ask in your own words',
+        title: 'Describe how you feel. Find the right doctor.',
+        body: 'Tell the assistant what is going on, in Arabic or English. It asks a few short questions, the way a receptionist would, before suggesting anyone.',
+      },
+      {
+        kicker: 'Matched by meaning',
+        title: 'Specialists that fit what you described.',
+        body: 'Search works on meaning, not keywords, so a loose description like “my thumb hurts when I grip” still lands on the right specialty.',
+      },
+      {
+        kicker: 'Book in a minute',
+        title: 'Pick an open time. Manage it from your email.',
+        body: 'See each doctor’s weekly hours, choose a slot, and get a confirmation with links to cancel or reschedule.',
+      },
+    ],
+    mocks: [
+      {
+        user1: 'My thumb hurts when I grip things.',
+        bot1: 'How long has it been going on, and does rest help?',
+        user2: 'About two weeks. Rest helps a bit.',
+      },
+      {
+        heading: 'Suggested specialists',
+        best: 'Best match',
+        rows: [
+          { specialty: 'Hand therapy', meta: 'Amman · Sat–Thu' },
+          { specialty: 'Rheumatology', meta: 'Amman · Sun–Thu' },
+          { specialty: 'Orthopaedics', meta: 'Irbid · Sat–Wed' },
+        ],
+      },
+      {
+        date: 'Saturday, 7 November',
+        times: ['9:00', '9:30', '10:00', '10:30', '11:00', '11:30'],
+        selected: '10:30',
+        confirmed: 'Booked. Confirmation sent to your email.',
+      },
+    ],
+    howEyebrow: 'How it works',
+    howTitle: 'From a question to a booked time',
+    howLede: 'Four steps, usually a couple of minutes.',
     steps: [
       { title: 'Describe your symptoms', body: 'Write the way you would to a receptionist. No medical terms or menus needed.' },
       { title: 'Answer a few questions', body: 'The assistant asks about duration and severity to narrow down the specialty.' },
       { title: 'Review suggested doctors', body: 'See matching doctors with their specialty, location and weekly hours.' },
       { title: 'Pick a time', body: 'Choose an open slot. Your confirmation email has links to cancel or reschedule.' },
     ],
-    featuresTitle: 'What you can do',
-    featuresLede: 'Use the assistant, or search the directory yourself.',
+    featuresEyebrow: 'What you can do',
+    featuresTitle: 'Use the assistant, or search on your own',
+    featuresLede: 'Everything works in Arabic and English, on any screen size.',
     features: [
       { title: 'Ask a health question', body: 'Answers are based on articles from a medical content library, with a reminder to see a doctor when it matters.' },
-      { title: 'Get doctor suggestions', body: 'Search works on meaning, so a loose description like “my thumb hurts when I grip” still finds relevant specialists.' },
+      { title: 'Get doctor suggestions', body: 'Describe what you feel and get specialists whose profiles match, with their next open times.' },
       { title: 'Book, cancel or reschedule', body: 'Manage a booking from the links in your email, or verify your email on the My appointments page.' },
       { title: 'Filter the directory', body: 'Narrow doctors by specialty, city or accepted insurance.' },
     ],
+    finalTitle: 'Ready when you are',
+    finalBody: 'Start a conversation, or browse the full directory of doctors.',
     noticeTitle: 'Not a substitute for a doctor',
     noticeBody: 'The assistant can make mistakes and does not diagnose or treat. In an emergency, call 911 or go to the nearest emergency department.',
-    finalTitle: 'Ready to start?',
   },
 
   about: {
@@ -102,10 +151,23 @@ const en = {
     log: 'Conversation',
     you: 'You',
     assistant: 'Assistant',
-    newChat: 'New conversation',
+    newChat: 'New chat',
+    history: 'Recent chats',
+    noHistory: 'Your conversations will appear here.',
+    historyNote: 'Saved only in this browser. Nothing is stored on an account.',
+    deleteChat: 'Delete chat: {title}',
+    clearAll: 'Delete all chats',
+    clearConfirm: 'Delete all saved chats from this browser? This can’t be undone.',
+    suggestionsTitle: 'Not sure where to start? Try one of these:',
+    suggestions: [
+      'My thumb hurts when I grip things',
+      'I need a dentist in Amman',
+      'What are the symptoms of diabetes?',
+    ],
   },
 
   doctors: {
+    eyebrow: 'Doctor directory',
     title: 'Find a doctor',
     searchLabel: 'Search by doctor name',
     searchPlaceholder: 'Doctor name',
@@ -138,7 +200,13 @@ const en = {
     loadError: 'Couldn’t load this doctor’s profile.',
     noAvailability: 'No hours on file.',
     loadingAvailability: 'Loading hours…',
-    sourceLink: 'Original listing on Altibbi',
+    eyebrow: 'Doctor profile',
+    about: 'About',
+    noAbout: 'No description on file.',
+    noInsurance: 'No insurance information on file.',
+    bookTitle: 'Book an appointment',
+    bookBody: 'Choose a day and an open time on the next page. The confirmation email has links to cancel or reschedule.',
+    allDoctors: 'All doctors',
   },
 
   days: {
@@ -174,10 +242,28 @@ const en = {
     successEmail: 'A confirmation email is on its way to {email}.',
     done: 'Done',
     required: 'Required',
+    eyebrow: 'Book an appointment',
+    stepWhen: 'Choose a day and time',
+    stepDetails: 'Your details',
+    chooseDay: 'Day',
+    today: 'Today',
+    closed: 'not working',
+    otherDate: 'Or pick another date:',
+    summary: 'Your appointment',
+    doctor: 'Doctor',
+    when: 'Date',
+    time: 'Time',
+    notChosen: 'Not chosen yet',
+    summaryNote: 'The confirmation and links to cancel or reschedule are sent to your email.',
+    pickTimeFirst: 'Choose a time to continue',
+    viewAppointments: 'View my appointments',
+    findAnother: 'Find another doctor',
   },
 
   myAppointments: {
     title: 'My appointments',
+    eyebrow: 'Your bookings',
+    lede: 'See, reschedule or cancel the appointments booked with your email. No account needed.',
     emailIntro: 'Enter the email you used to book. We’ll send you a 6-digit code.',
     emailLabel: 'Email',
     sendCode: 'Send code',
@@ -190,7 +276,8 @@ const en = {
     none: 'No appointments found for this email.',
     reschedule: 'Reschedule',
     cancel: 'Cancel',
-    status: { confirmed: 'Confirmed', cancelled: 'Cancelled' },
+    status: { confirmed: 'Confirmed', cancelled: 'Cancelled', rescheduled: 'Rescheduled', completed: 'Completed' },
+    count: '{count} appointments for {email}',
   },
 
   reschedule: {
@@ -203,6 +290,9 @@ const en = {
     successTitle: 'Appointment rescheduled',
     successBody: 'With {name}, now on {date} at {time}.',
     missingToken: 'This link is incomplete. Open it again from your email.',
+    eyebrow: 'Change your appointment',
+    currentLabel: 'Current appointment',
+    newLabel: 'New day and time',
   },
 
   cancel: {
@@ -213,6 +303,8 @@ const en = {
     cancelling: 'Cancelling…',
     doneTitle: 'Appointment cancelled',
     doneBody: 'Your appointment with {name} has been cancelled.',
+    eyebrow: 'Your appointment',
+    note: 'This frees the time for other patients. You can book again at any time.',
   },
 
   notFound: {
@@ -235,7 +327,8 @@ const en = {
         {
           h: 'What we collect, and why',
           list: [
-            'Chat messages: to generate the assistant’s replies. Kept for 30 minutes of inactivity, then deleted automatically.',
+            'Chat messages: to generate the assistant’s replies. The server keeps them for 30 minutes of inactivity, then deletes them automatically.',
+            'Saved chats: your conversations are also saved in your own browser so you can reopen them. They stay on your device, never on our servers, until you delete them from the chat list. When you continue an old chat, its earlier messages are sent again so the assistant has the context.',
             'Booking details (name, email, phone, doctor, date and time): to record the appointment and email you a confirmation with cancel and reschedule links.',
             'Email address on the My appointments page: to send a one-time verification code, which expires after 10 minutes.',
             'Language preference: stored in your browser so the site remembers Arabic or English.',
@@ -259,7 +352,7 @@ const en = {
         },
         {
           h: 'How long we keep it',
-          p: ['Chat history: 30 minutes after your last message. Verification codes: 10 minutes. Bookings and the contact details attached to them: until you ask for deletion or the demo database is reset.'],
+          p: ['Chat history on the server: 30 minutes after your last message. Saved chats in your browser: until you delete them. Verification codes: 10 minutes. Bookings and the contact details attached to them: until you ask for deletion or the demo database is reset.'],
         },
         {
           h: 'Your rights',
@@ -327,6 +420,7 @@ const en = {
           h: 'Browser storage we do use',
           list: [
             '“lang”: remembers whether you chose Arabic or English. Stays until you clear your browser data.',
+            '“chat-history-v1”: your saved conversations, so you can reopen them. Delete them any time from the chat list (“Delete all chats”).',
             'Admin session token: only stored if you sign in to the admin pages.',
           ],
           p: ['Both are needed for the site to work the way you asked, so no consent banner is required. If analytics or other optional tracking is added later, we will ask for your consent first.'],

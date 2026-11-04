@@ -10,13 +10,24 @@
 }
 
 .doctor-row:hover {
-  border-color: #c9d0e4;
+  border-color: #cfcabd;
   box-shadow: var(--shadow-card);
 }
 
 .doctor-row-content {
   flex: 1;
   min-width: 0;
+}
+
+/* Doctor data is Arabic. dir="auto" renders it correctly, but would also
+   right-align it inside the English layout; keep it aligned with the page. */
+[dir="ltr"] .doctor-row [dir="auto"],
+[dir="ltr"] .doctor-detail-panel [dir="auto"] {
+  text-align: left;
+}
+[dir="rtl"] .doctor-row [dir="auto"],
+[dir="rtl"] .doctor-detail-panel [dir="auto"] {
+  text-align: right;
 }
 
 .doctor-row-name {
@@ -30,27 +41,12 @@
 .doctor-row-specialty {
   display: inline-block;
   margin: 6px 0 0;
-  background: #e8f4fd;
-  color: #075985;
+  background: var(--accent-soft);
+  color: var(--accent-text);
   font-size: 0.8rem;
   font-weight: 500;
   padding: 3px 12px;
   border-radius: var(--radius-pill);
-}
-
-.doctor-avatar {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--navy-800), #2c3a7a);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: 0.02em;
 }
 
 .doctor-row-location {
@@ -90,11 +86,13 @@
   font-family: inherit;
   font-size: 0.87rem;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
 }
 
 .doctor-row-view-btn:hover {
-  background: var(--navy-800);
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
 }
 
 .doctor-row-more {
@@ -127,10 +125,5 @@
   .doctor-row {
     padding: 16px;
     gap: 12px;
-  }
-  .doctor-avatar {
-    width: 40px;
-    height: 40px;
-    font-size: 0.85rem;
   }
 }

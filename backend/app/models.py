@@ -101,10 +101,18 @@ class DoctorRecommendationOut(BaseModel):
 class DoctorRecommendResponse(BaseModel):
     doctors: list[DoctorRecommendationOut]
 
+class ChatHistoryMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(max_length=4000)
+
+
 class ChatRequest(BaseModel):
     session_id: str | None = None
     message: str
     language: Literal["en", "ar"] = "en"  # site UI language, used when the message has no letters
+    # Earlier turns of a conversation saved in the browser. Only used when the
+    # server-side history has expired, so a reopened chat keeps its context.
+    history: list[ChatHistoryMessage] = Field(default_factory=list, max_length=40)
 
 
 class ChatResponse(BaseModel):

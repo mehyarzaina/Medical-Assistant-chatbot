@@ -5,7 +5,7 @@
 }
 
 .about-hero {
-  background: linear-gradient(135deg, var(--navy-900), var(--navy-800));
+  background: linear-gradient(135deg, var(--dark-900), var(--dark-800));
   color: #fff;
   border-radius: var(--radius-lg);
   padding: 36px 32px;

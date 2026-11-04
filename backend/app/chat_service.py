@@ -160,10 +160,24 @@ def enforce_emergency_number(reply: str) -> str:
     return _CALLED_NUMBER.sub(lambda m: m.group("before") + "911", reply)
 
 
+MAX_RESTORED_TURNS = 20  # messages restored from the browser when Redis has expired
+
+
 async def handle_chat_message(
-    session_id: str, message: str, ui_language: str = "en"
+    session_id: str,
+    message: str,
+    ui_language: str = "en",
+    saved_history: list[dict] | None = None,
 ) -> tuple[str, list]:
     history = await _get_history(session_id)
+    if not history and saved_history:
+        # Redis forgot this conversation (30 min TTL); fall back to the copy
+        # the browser kept. Plain user/assistant text only — no tool messages.
+        history = [
+            {"role": m["role"], "content": m["content"]}
+            for m in saved_history[-MAX_RESTORED_TURNS:]
+            if m.get("role") in ("user", "assistant") and m.get("content")
+        ]
     reply_language = detect_language(message, fallback=ui_language)
 
     # The model drifts toward the language of the history or the retrieved

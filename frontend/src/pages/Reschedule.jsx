@@ -1,15 +1,16 @@
 import { useState, useEffect, useId } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-import { getAppointment, rescheduleAppointment, getAvailableSlots } from "../api";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { getAppointment, rescheduleAppointment, getDoctorAvailability } from "../api";
+import BackButton from "../components/BackButton";
+import DayPicker from "../components/DayPicker";
 import SlotPicker from "../components/SlotPicker";
-import { todayISO } from "../utils/date";
+import { useSlots } from "../hooks/useDoctorData";
+import { formatDateISO, todayISO, workingWeekdays } from "../utils/date";
 import { useLanguage } from "../i18n/useLanguage";
 import usePageTitle from "../hooks/usePageTitle";
-import "../components/BookingModal.css"; // reuse the same slot/date/button styling
-import "./Reschedule.css";
 
 export default function Reschedule() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   usePageTitle("reschedule");
   const slotsLabelId = useId();
   const { appointmentId } = useParams();
@@ -17,14 +18,13 @@ export default function Reschedule() {
   const token = searchParams.get("token");
 
   const [appointment, setAppointment] = useState(null);
-  const [loadingAppointment, setLoadingAppointment] = useState(true);
+  const [schedule, setSchedule] = useState([]);
+  const [loadingAppointment, setLoadingAppointment] = useState(!!token);
   const [loadError, setLoadError] = useState(null);
 
   const [date, setDate] = useState(todayISO());
-  const [slots, setSlots] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
-  const [slotsLoading, setSlotsLoading] = useState(false);
-  const [slotsError, setSlotsError] = useState(null);
+  const slots = useSlots(appointment?.doctor_id, appointment ? date : null);
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -32,39 +32,23 @@ export default function Reschedule() {
 
   // Load the existing appointment first (needs doctor_id for slot lookups)
   useEffect(() => {
-    if (!token) {
-      setLoadError(t("reschedule.missingToken"));
-      setLoadingAppointment(false);
-      return;
-    }
+    if (!token) return;
     getAppointment(appointmentId, token)
-      .then(setAppointment)
+      .then((appt) => {
+        setAppointment(appt);
+        // Weekly hours only grey out closed days; booking still works without them.
+        return getDoctorAvailability(appt.doctor_id)
+          .then((data) => setSchedule(data.schedule || []))
+          .catch(() => {});
+      })
       .catch((err) => setLoadError(err.message))
       .finally(() => setLoadingAppointment(false));
-    // t is left out on purpose: switching language must not refetch the appointment.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appointmentId, token]);
 
-  // Same slot-fetch + normalization pattern as BookingModal
-  useEffect(() => {
-    if (!appointment) return;
-    let cancelled = false;
-    setSlotsLoading(true);
-    setSlotsError(null);
+  function changeDate(iso) {
+    setDate(iso);
     setSelectedTime(null);
-
-    getAvailableSlots(appointment.doctor_id, date)
-      .then((data) => {
-        if (cancelled) return;
-        const raw = data.times || data || [];
-        const times = raw.map((s) => (typeof s === "string" ? s : s.time));
-        setSlots(times);
-      })
-      .catch((err) => { if (!cancelled) setSlotsError(err.message); })
-      .finally(() => { if (!cancelled) setSlotsLoading(false); });
-
-    return () => { cancelled = true; };
-  }, [appointment, date]);
+  }
 
   async function handleConfirm() {
     setSubmitting(true);
@@ -72,6 +56,7 @@ export default function Reschedule() {
     try {
       await rescheduleAppointment(appointmentId, token, date, selectedTime);
       setConfirmed(true);
+      window.scrollTo(0, 0);
     } catch (err) {
       setSubmitError(err.message);
     } finally {
@@ -79,57 +64,76 @@ export default function Reschedule() {
     }
   }
 
+  const error = token ? loadError : t("reschedule.missingToken");
+
   if (loadingAppointment) {
-    return <div className="reschedule-page"><p className="booking-status" role="status">{t("common.loading")}</p></div>;
+    return <div className="page page-narrow"><p className="status-text" role="status">{t("common.loading")}</p></div>;
   }
-  if (loadError) {
-    return <div className="reschedule-page"><p className="booking-status booking-error" role="alert">{loadError}</p></div>;
+  if (error) {
+    return (
+      <div className="page page-narrow">
+        <div className="panel">
+          <p className="form-error" role="alert">{error}</p>
+          <Link to="/appointments" className="btn btn-primary btn-sm">{t("nav.appointments")}</Link>
+        </div>
+      </div>
+    );
   }
+
+  const longDate = (iso) => formatDateISO(iso, lang, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
   if (confirmed) {
     return (
-      <div className="reschedule-page">
-        <div className="reschedule-card booking-success" role="status">
-          <div className="booking-success-icon" aria-hidden="true">✓</div>
-          <h1>{t("reschedule.successTitle")}</h1>
-          <p>{t("reschedule.successBody", { name: appointment.doctor_name, date, time: selectedTime })}</p>
+      <div className="page page-narrow align-page">
+        <div className="panel" role="status">
+          <div className="result-icon" aria-hidden="true">✓</div>
+          <h1 className="page-title">{t("reschedule.successTitle")}</h1>
+          <dl className="facts">
+            <div><dt>{t("booking.doctor")}</dt><dd dir="auto">{appointment.doctor_name}</dd></div>
+            <div><dt>{t("booking.when")}</dt><dd>{longDate(date)}</dd></div>
+            <div><dt>{t("booking.time")}</dt><dd dir="ltr">{selectedTime}</dd></div>
+          </dl>
+          <div className="actions-row">
+            <Link to="/appointments" className="btn btn-primary">{t("booking.viewAppointments")}</Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="reschedule-page">
-      <div className="reschedule-card">
-        <h1>{t("reschedule.title", { name: appointment.doctor_name })}</h1>
-        <p className="reschedule-current">
-          {t("reschedule.current", { date: appointment.date, time: appointment.time })}
-        </p>
+    <div className="page page-narrow align-page">
+      <BackButton fallback="/appointments" />
+      <header className="page-head">
+        <p className="page-eyebrow">{t("reschedule.eyebrow")}</p>
+        <h1 className="page-title">{t("reschedule.title", { name: appointment.doctor_name })}</h1>
+      </header>
 
-        <label className="booking-label" htmlFor="reschedule-date">{t("reschedule.newDate")}</label>
-        <input
-          id="reschedule-date"
-          type="date"
-          className="booking-date-input"
-          min={todayISO()}
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
+      <section className="panel panel-dark" aria-labelledby="reschedule-current">
+        <h2 className="panel-title" id="reschedule-current">{t("reschedule.currentLabel")}</h2>
+        <dl className="facts">
+          <div><dt>{t("booking.when")}</dt><dd>{longDate(appointment.date)}</dd></div>
+          <div><dt>{t("booking.time")}</dt><dd dir="ltr">{appointment.time}</dd></div>
+        </dl>
+      </section>
 
+      <section className="panel" aria-labelledby="reschedule-new">
+        <h2 className="panel-title" id="reschedule-new">{t("reschedule.newLabel")}</h2>
+        <DayPicker value={date} onChange={changeDate} workingDays={workingWeekdays(schedule)} />
         <SlotPicker
-          slots={slots}
+          slots={slots.slots}
           selectedTime={selectedTime}
           onSelect={setSelectedTime}
-          loading={slotsLoading}
-          error={slotsError}
+          loading={slots.loading}
+          error={slots.error}
           labelId={slotsLabelId}
         />
 
-        {submitError && <p className="booking-status booking-error" role="alert">{submitError}</p>}
+        {submitError && <p className="form-error" role="alert">{submitError}</p>}
 
         <button
           type="button"
-          className="booking-submit-btn"
+          className="btn btn-primary btn-block reschedule-submit"
           disabled={!selectedTime || submitting}
           onClick={handleConfirm}
         >
@@ -139,7 +143,7 @@ export default function Reschedule() {
               ? t("reschedule.confirm", { time: selectedTime })
               : t("reschedule.pick")}
         </button>
-      </div>
+      </section>
     </div>
   );
 }

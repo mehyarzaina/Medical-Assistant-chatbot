@@ -54,10 +54,12 @@ export function recommendDoctors(query, topK = 3, daysAhead = 7) {
 
 // language is the site UI language; the backend uses it only when the
 // message itself has no letters to detect a language from.
-export async function sendChatMessage(sessionId, message, language) {
+// history is the conversation saved in the browser, so a chat reopened after
+// the server forgot it (30 min) still has its context.
+export async function sendChatMessage(sessionId, message, language, history = []) {
   return apiFetch("/chat", {
     method: "POST",
-    body: JSON.stringify({ session_id: sessionId, message, language }),
+    body: JSON.stringify({ session_id: sessionId, message, language, history }),
   });
 }
 
@@ -166,16 +168,19 @@ export function adminListInsuranceCompanies() {
 }
 
 export function adminCreateInsuranceCompany(name) {
-  return apiFetchAdmin('/admin/insurance', {
-    method: 'POST',
-    body: JSON.stringify({ name }),
-  });
+  // The endpoint reads the name from the query string, not a JSON body.
+  return apiFetchAdmin(`/admin/insurance?name=${encodeURIComponent(name)}`, { method: 'POST' });
 }
 
 export function getAdminStats(filters = {}) {
   const params = new URLSearchParams(filters);
   const query = params.toString();
   return apiFetchAdmin(`/admin/stats${query ? `?${query}` : ''}`);
+}
+
+export function getAdminChartStats(filters = {}) {
+  const query = new URLSearchParams(filters).toString();
+  return apiFetchAdmin(`/admin/stats/charts${query ? `?${query}` : ''}`);
 }
 
 export function getAdminSpecialties() {

@@ -6,6 +6,8 @@ import DemoBanner from './components/DemoBanner';
 import Welcome from './pages/Welcome';
 import Chat from './pages/Chat';
 import Doctors from './pages/Doctors';
+import DoctorProfile from './pages/DoctorProfile';
+import BookAppointment from './pages/BookAppointment';
 import MyAppointments from './pages/MyAppointments';
 import Reschedule from './pages/Reschedule';
 import Cancel from './pages/Cancel';
@@ -49,6 +51,8 @@ function AppShell() {
             <Route path="/" element={<Welcome />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/doctors" element={<Doctors />} />
+            <Route path="/doctors/:doctorId" element={<DoctorProfile />} />
+            <Route path="/doctors/:doctorId/book" element={<BookAppointment />} />
             <Route path="/appointments" element={<MyAppointments />} />
             <Route path="/appointments/:appointmentId/reschedule" element={<Reschedule />} />
             <Route path="/appointments/:appointmentId/cancel" element={<Cancel />} />

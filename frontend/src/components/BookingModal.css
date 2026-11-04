@@ -1,7 +1,7 @@
 .booking-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(11, 17, 48, 0.45);
+  background: rgba(15, 19, 17, 0.5);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -14,7 +14,7 @@
   position: relative;
   background: var(--card);
   border-radius: var(--radius-lg);
-  box-shadow: 0 12px 40px rgba(11, 17, 48, 0.25);
+  box-shadow: 0 12px 40px rgba(15, 19, 17, 0.25);
   padding: 32px;
   max-width: 440px;
   width: 100%;
@@ -170,7 +170,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: rgba(56, 189, 248, 0.15);
+  background: var(--accent-soft);
   color: var(--accent-text);
   font-size: 1.4rem;
   display: flex;

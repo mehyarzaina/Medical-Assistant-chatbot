@@ -1,0 +1,89 @@
+.profile-page {
+  max-width: 1240px;
+}
+
+.profile-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 32px;
+  flex-wrap: wrap;
+  padding-bottom: 28px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-hero-text {
+  min-width: 0;
+  flex: 1 1 420px;
+}
+
+.profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin-top: 6px;
+}
+
+.profile-location {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.profile-location svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.profile-about {
+  margin: 0;
+  line-height: 1.75;
+  color: var(--ink);
+}
+
+.profile-main .availability-row {
+  font-size: 0.93rem;
+  padding: 10px 0;
+}
+
+.profile-insurance {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profile-book-body {
+  margin: 0 0 18px;
+  color: #c9d1cc;
+  line-height: 1.6;
+  font-size: 0.93rem;
+}
+
+.profile-book-facts {
+  margin-bottom: 20px;
+}
+
+.profile-data-note {
+  margin-top: 12px;
+}
+
+@media (max-width: 640px) {
+  .profile-hero-cta {
+    width: 100%;
+  }
+}
+
+/* Two columns: the side panel already has the booking button. */
+@media (min-width: 1181px) {
+  .profile-hero-cta {
+    display: none;
+  }
+}

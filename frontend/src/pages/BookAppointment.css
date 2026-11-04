@@ -1,0 +1,60 @@
+.book-page {
+  max-width: 1240px;
+}
+
+.book-page .page-head .tag {
+  margin-top: 2px;
+}
+
+.book-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+.book-field-wide {
+  grid-column: 1 / -1;
+}
+
+.book-submit {
+  margin-top: 22px;
+}
+
+.book-pending {
+  color: #a9b2ad;
+  font-weight: 400;
+}
+
+.book-summary-note {
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: #c9d1cc;
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.book-done {
+  padding: 36px;
+}
+
+.book-done .facts {
+  margin-top: 18px;
+}
+
+.book-done-note {
+  margin: 20px 0 0;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 640px) {
+  .book-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .book-done {
+    padding: 24px 18px;
+  }
+  .facts div {
+    grid-template-columns: 90px minmax(0, 1fr);
+  }
+}

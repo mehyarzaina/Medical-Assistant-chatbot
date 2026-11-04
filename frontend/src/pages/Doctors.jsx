@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import BackButton from '../components/BackButton';
 import FilterBar from '../components/FilterBar';
 import DoctorCard from '../components/DoctorCard';
-import DoctorDetail from '../components/DoctorDetail';
 import { getDoctors, getInsuranceCompanies } from '../api';
 import { useLanguage } from '../i18n/useLanguage';
 import usePageTitle from '../hooks/usePageTitle';
@@ -26,7 +25,6 @@ function Doctors() {
     specialties: [], locations: [], insurances: [],
   });
   const [nameSearch, setNameSearch] = useState('');
-  const [selectedDoctorId, setSelectedDoctorId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -65,9 +63,12 @@ function Doctors() {
     : doctors;
 
   return (
-    <div className="doctors-page">
+    <div className="page doctors-page">
       <BackButton />
-      <h1>{t('doctors.title')}</h1>
+      <header className="page-head">
+        <p className="page-eyebrow">{t('doctors.eyebrow')}</p>
+        <h1 className="page-title">{t('doctors.title')}</h1>
+      </header>
 
       <label className="doctors-search-label" htmlFor="doctor-search">{t('doctors.searchLabel')}</label>
       <input
@@ -100,13 +101,10 @@ function Doctors() {
 
       <div className="doctors-grid">
         {visibleDoctors.map((doctor) => (
-          <DoctorCard key={doctor.doctor_id} doctor={doctor} onSelect={setSelectedDoctorId} />
+          <DoctorCard key={doctor.doctor_id} doctor={doctor} />
         ))}
       </div>
 
-      {selectedDoctorId && (
-        <DoctorDetail doctorId={selectedDoctorId} onClose={() => setSelectedDoctorId(null)} />
-      )}
     </div>
   );
 }

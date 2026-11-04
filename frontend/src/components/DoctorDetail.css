@@ -1,7 +1,7 @@
 .doctor-detail-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(11, 17, 48, 0.45);
+  background: rgba(15, 19, 17, 0.5);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -14,7 +14,7 @@
   position: relative;
   background: var(--card);
   border-radius: var(--radius-lg);
-  box-shadow: 0 12px 40px rgba(11, 17, 48, 0.25);
+  box-shadow: 0 12px 40px rgba(15, 19, 17, 0.25);
   padding: 32px;
   max-width: 480px;
   width: 100%;
@@ -65,15 +65,15 @@
   margin: 0 0 6px;
 }
 
-.doctor-detail-header > div {
+.doctor-detail-header > div:not(.doctor-avatar) {
   min-width: 0;
   padding-inline-end: 40px;
 }
 
 .doctor-specialty-tag {
   display: inline-block;
-  background: #e8f4fd;
-  color: #075985;
+  background: var(--accent-soft);
+  color: var(--accent-text);
   font-size: 0.8rem;
   font-weight: 500;
   padding: 3px 12px;
@@ -113,13 +113,7 @@
   margin: 18px 0 4px;
 }
 
-.doctor-detail-source {
-  display: inline-block;
-  margin-top: 16px;
-  font-size: 0.87rem;
-  color: var(--accent-text);
-  font-weight: 500;
-}
+
 
 .doctor-detail-about {
   color: var(--ink);
@@ -167,7 +161,7 @@
 }
 
 .doctor-detail-book-btn:hover {
-  background: var(--navy-800);
+  background: var(--dark-800);
 }
 
 @media (max-width: 640px) {

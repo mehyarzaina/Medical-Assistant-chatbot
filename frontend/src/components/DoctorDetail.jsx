@@ -91,12 +91,6 @@ function DoctorDetail({ doctorId, onClose }) {
             </div>
           )}
 
-          {doctor.profile_url && (
-            <a className="doctor-detail-source" href={doctor.profile_url} target="_blank" rel="noopener noreferrer">
-              {t('doctor.sourceLink')}
-            </a>
-          )}
-
           <button type="button" className="doctor-detail-book-btn" onClick={() => setShowBooking(true)}>
             {t('doctor.book')}
           </button>

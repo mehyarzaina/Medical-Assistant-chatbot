@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminLogin } from '../../api';
+import BackButton from '../../components/BackButton';
 import { setAdminToken } from '../../utils/adminAuth';
+import usePageTitle from '../../hooks/usePageTitle';
 import '../../styles/admin.css';
 
 function AdminLogin() {
+  usePageTitle('admin');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +21,7 @@ function AdminLogin() {
       const res = await adminLogin(password);
       setAdminToken(res.session_token);
       navigate('/admin/dashboard');
-    } catch (err) {
+    } catch {
       setError('Incorrect password.');
     } finally {
       setLoading(false);
@@ -26,31 +29,32 @@ function AdminLogin() {
   }
 
   return (
-    <div className="admin-login-page">
-      <button className="admin-back-btn" onClick={() => navigate('/')}>
-        ← Back
-      </button>
+    <div className="page page-narrow" dir="ltr" lang="en">
+      <BackButton />
+      <header className="page-head">
+        <p className="page-eyebrow">Admin</p>
+        <h1 className="page-title">Log in</h1>
+        <p className="page-lede">Enter the admin password to see the dashboard, bookings and the doctor directory.</p>
+      </header>
 
-      <h1 className="admin-login-title">Admin Login</h1>
-
-      <div className="admin-login">
-        <p className="admin-login-intro">
-          Enter the admin password to access the dashboard.
-        </p>
-        <form onSubmit={handleSubmit}>
+      <form className="panel admin-login" onSubmit={handleSubmit}>
+        <div className="field">
+          <label className="field-label" htmlFor="admin-password">Password</label>
           <input
+            id="admin-password"
+            className="input"
             type="password"
-            placeholder="Admin password"
+            autoComplete="current-password"
+            required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoFocus
           />
-          <button className="admin-login-submit" type="submit" disabled={loading}>
-            {loading ? 'Checking...' : 'Log in'}
-          </button>
-          {error && <div className="admin-error">{error}</div>}
-        </form>
-      </div>
+        </div>
+        {error && <p className="form-error" role="alert">{error}</p>}
+        <button className="btn btn-primary btn-block" type="submit" disabled={loading}>
+          {loading ? 'Checking…' : 'Log in'}
+        </button>
+      </form>
     </div>
   );
 }

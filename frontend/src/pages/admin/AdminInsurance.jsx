@@ -1,74 +1,78 @@
 import { useEffect, useState } from 'react';
 import { adminListInsuranceCompanies, adminCreateInsuranceCompany } from '../../api';
-import '../../styles/admin.css';
+import AdminLayout from '../../components/admin/AdminLayout';
+import usePageTitle from '../../hooks/usePageTitle';
 
 function AdminInsurance() {
-  const [companies, setCompanies] = useState([]);
+  usePageTitle('admin');
+  const [companies, setCompanies] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [newName, setNewName] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => { load(); }, []);
-
-  function load() {
-    setLoading(true);
-    adminListInsuranceCompanies().then((res) => {
-      setCompanies(res);
-      setLoading(false);
-    });
-  }
+  useEffect(() => {
+    adminListInsuranceCompanies()
+      .then(setCompanies)
+      .catch((err) => { setError(err.message); setCompanies([]); });
+  }, [reloadKey]);
 
   async function handleAdd(e) {
     e.preventDefault();
     if (!newName.trim()) return;
     setError('');
+    setSaving(true);
     try {
       await adminCreateInsuranceCompany(newName.trim());
       setNewName('');
-      load();
+      setReloadKey((k) => k + 1);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setSaving(false);
     }
   }
 
   return (
-    <div className="admin-page">
-      <div className="admin-header">
-        <h2>Insurance Companies</h2>
-      </div>
-
-      {error && <div className="admin-error">{error}</div>}
-
+    <AdminLayout title="Insurance companies" lede="Companies patients can filter doctors by.">
       <form className="admin-filters" onSubmit={handleAdd}>
-        <label>
-          Add company
+        <div className="field">
+          <label className="field-label" htmlFor="insurance-name">Add a company</label>
           <input
+            id="insurance-name"
+            className="input"
             type="text"
+            dir="auto"
             placeholder="Company name"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
           />
-        </label>
-        <button className="admin-btn" type="submit">Add</button>
+        </div>
+        <button className="btn btn-primary btn-sm" type="submit" disabled={saving || !newName.trim()}>
+          {saving ? 'Adding…' : 'Add company'}
+        </button>
       </form>
 
+      {error && <div className="admin-error" role="alert">{error}</div>}
+      {companies && <p className="admin-table-count">{companies.length} companies</p>}
+
       <div className="admin-table-wrapper">
-        {loading ? (
-          <div className="admin-empty">Loading...</div>
+        {companies === null ? (
+          <div className="admin-empty">Loading…</div>
         ) : companies.length === 0 ? (
           <div className="admin-empty">No insurance companies yet.</div>
         ) : (
           <table className="admin-table">
-            <thead><tr><th>Name</th></tr></thead>
+            <thead><tr><th scope="col">Name</th></tr></thead>
             <tbody>
               {companies.map((name) => (
-                <tr key={name}><td>{name}</td></tr>
+                <tr key={name}><td dir="auto">{name}</td></tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 

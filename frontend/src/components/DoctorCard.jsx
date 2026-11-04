@@ -1,13 +1,13 @@
 import { useId, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getDoctorAvailability } from '../api';
 import { useLanguage } from '../i18n/useLanguage';
 import AvailabilitySchedule from './AvailabilitySchedule';
-import { getInitials } from '../utils/doctor';
 import './DoctorCard.css';
 
 const ABOUT_PREVIEW_LENGTH = 140;
 
-function DoctorCard({ doctor, onSelect }) {
+function DoctorCard({ doctor }) {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   const [schedule, setSchedule] = useState(null);
@@ -30,8 +30,6 @@ function DoctorCard({ doctor, onSelect }) {
 
   return (
     <article className="doctor-row">
-      <div className="doctor-avatar" aria-hidden="true" dir="auto">{getInitials(doctor.name)}</div>
-
       <div className="doctor-row-content">
         <h3 className="doctor-row-name" dir="auto">{doctor.name}</h3>
         {doctor.specialty && <p className="doctor-row-specialty" dir="auto">{doctor.specialty}</p>}
@@ -61,14 +59,13 @@ function DoctorCard({ doctor, onSelect }) {
         )}
 
         <div className="doctor-row-actions">
-          <button
-            type="button"
+          <Link
+            to={`/doctors/${doctor.doctor_id}`}
             className="doctor-row-view-btn"
-            onClick={() => onSelect(doctor.doctor_id)}
             aria-label={t('doctor.profileOf', { name: doctor.name })}
           >
             {t('doctor.viewProfile')}
-          </button>
+          </Link>
           <button
             type="button"
             className="doctor-row-more"

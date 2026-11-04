@@ -6,7 +6,7 @@
   inset-inline-start: 0;
   bottom: 0;
   width: var(--sidebar-width);
-  background: linear-gradient(180deg, var(--navy-900), var(--navy-950));
+  background: linear-gradient(180deg, var(--dark-900), var(--dark-950));
   padding: 28px 16px;
   display: flex;
   flex-direction: column;
@@ -40,8 +40,8 @@
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--violet));
-  color: var(--navy-950);
+  background: linear-gradient(135deg, var(--accent-bright), var(--sand));
+  color: var(--dark-950);
   flex-shrink: 0;
 }
 
@@ -73,7 +73,7 @@
 .sidebar-links a.active {
   color: #fff;
   font-weight: 600;
-  background: rgba(56, 189, 248, 0.18);
+  background: rgba(159, 211, 187, 0.16);
   box-shadow: inset 3px 0 0 var(--accent);
 }
 [dir="rtl"] .sidebar-links a.active {
@@ -183,7 +183,7 @@
     right: 0;
     height: var(--topbar-height);
     padding: 0 12px 0 16px;
-    background: var(--navy-900);
+    background: var(--dark-900);
     color: #fff;
     z-index: 45;
   }
@@ -228,7 +228,7 @@
     display: block;
     position: fixed;
     inset: var(--topbar-height) 0 0 0;
-    background: rgba(6, 10, 31, 0.5);
+    background: rgba(15, 19, 17, 0.5);
     z-index: 35;
   }
 }

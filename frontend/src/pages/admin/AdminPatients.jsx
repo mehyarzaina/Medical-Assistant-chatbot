@@ -1,64 +1,61 @@
 import { useEffect, useState } from 'react';
 import { adminListPatients } from '../../api';
-import '../../styles/admin.css';
+import AdminLayout from '../../components/admin/AdminLayout';
+import usePageTitle from '../../hooks/usePageTitle';
 
 function AdminPatients() {
-  const [patients, setPatients] = useState([]);
+  usePageTitle('admin');
+  const [patients, setPatients] = useState(null);
+  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    adminListPatients().then((res) => {
-      setPatients(res);
-      setLoading(false);
-    });
+    adminListPatients()
+      .then(setPatients)
+      .catch((err) => { setError(err.message); setPatients([]); });
   }, []);
 
-  const filtered = patients.filter((p) => {
-    const q = search.toLowerCase();
-    return (
-      p.name?.toLowerCase().includes(q) ||
-      p.email?.toLowerCase().includes(q) ||
-      p.phone?.toLowerCase().includes(q)
-    );
-  });
+  const q = search.trim().toLowerCase();
+  const filtered = (patients ?? []).filter((p) =>
+    [p.name, p.email, p.phone].some((v) => v?.toLowerCase().includes(q)));
 
   return (
-    <div className="admin-page">
-      <div className="admin-header">
-        <h2>Patients</h2>
-      </div>
-
+    <AdminLayout title="Patients" lede="People who have booked at least once. Saved from the booking form.">
       <div className="admin-filters">
-        <label>
-          Search
+        <div className="field">
+          <label className="field-label" htmlFor="patient-search">Search</label>
           <input
-            type="text"
-            placeholder="Name, email, or phone"
+            id="patient-search"
+            className="input"
+            type="search"
+            placeholder="Name, email or phone"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-        </label>
+        </div>
       </div>
 
+      {error && <div className="admin-error" role="alert">{error}</div>}
+      {patients && <p className="admin-table-count" aria-live="polite">{filtered.length} patients</p>}
+
       <div className="admin-table-wrapper">
-        {loading ? (
-          <div className="admin-empty">Loading...</div>
+        {patients === null ? (
+          <div className="admin-empty">Loading…</div>
         ) : filtered.length === 0 ? (
           <div className="admin-empty">No patients match this search.</div>
         ) : (
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((p) => (
                 <tr key={p.email}>
-                  <td>{p.name}</td>
+                  <td dir="auto"><strong>{p.name}</strong></td>
                   <td>{p.email}</td>
                   <td>{p.phone}</td>
                 </tr>
@@ -67,7 +64,7 @@ function AdminPatients() {
           </table>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 
